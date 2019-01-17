@@ -36,17 +36,9 @@ def uunifast(n, U):
         # nextSumU = sumU * (random.uniform(0, 1)**(1/(n-i)))
         # if(nextSumU == 0):
         #     i = i-1
-
-        # in case we not to generate a task with 0 utilization
-        # so we candidate a nextSumU and as it satisfies our constraint, we'll use it as nextSumU
-        nextSumUCandidate = sumU * (random.uniform(0, 1)**(1/(n-i)))
-        if (sumU - nextSumUCandidate != 0):
-            nextSumU = nextSumUCandidate
-            vectU.append(sumU-nextSumU)
-            sumU = nextSumU
-        else:
-            i -= 1
-            print ("***************")
+        nextSumU = sumU * (random.uniform(0, 1)**(1/(n-i)))
+        vectU.append(sumU-nextSumU)
+        sumU = nextSumU
 
     vectU.append(sumU)
 
@@ -70,15 +62,15 @@ def writeTaskSetToFile(TaskSetID, taskSetList, file):
 
 def uunifasts(N, n, U):
     file = open("Task_List.txt", "a")
-    for i in range(0, N):
+    counter = 1
+    while(counter <= N):
         Sum, Vect = uunifast(n, U)
         # Because of rounding error, accept Task List only when Utilization is exactly equal to 1
         if(Sum == 1):
             # call function that makes the
             taskSet = generateTaskFromUtilization(Vect)
-            writeTaskSetToFile(i, taskSet, file)
-        else:
-            i -= 1
+            writeTaskSetToFile(counter, taskSet, file)
+            counter += 1
 
 
 uunifasts(100, 100, 1)
