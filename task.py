@@ -23,6 +23,7 @@ class task(object):
     def __init__(self, p, e):
         self.period = p
         self.executionTime = e
+        self.seen = False
 
     def Period(self):
         return self.period
@@ -35,3 +36,7 @@ class task(object):
 
     def RelativeDeadline(self):
         return self.period
+    def getSeenFlag(self):
+        return self.seen
+    def seen(self):
+        self.seen = True
