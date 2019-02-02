@@ -24,7 +24,13 @@ def uunifast(n, U):
 
 
 def uunifasts(N, n, U):
-    file = open("Task_List.txt", "a")
+    # if there is a file at the moment, overwrite on it 
+    file = open("Task_List.txt", "w")
+
+    # will be used for configuration propose
+    configuration_data = str(N) + " " + str(n)
+    file.write(configuration_data)
+    file.write("\n")
     counter = 1
     while(counter <= N):
         Sum, Vect = uunifast(n, U)
