@@ -7,6 +7,7 @@ from math import floor
 from LCM import LCM
 INFINITY = 9999999999
 
+
 def readTaskLists(FileAddress):
     tasksListDB = open(FileAddress, 'r')
 
@@ -47,43 +48,74 @@ def readTaskLists(FileAddress):
 def findMinimumDeadlineNotSeen(TaskSet):
     minimum = INFINITY
     minID = -1
-    for i in range (0 , len(TaskSet)):
+    for i in range(0, len(TaskSet)):
         if (TaskSet[i].period <= minimum and TaskSet[i].getSeenFlag() == False):
             minimum = TaskSet[i].period
             minID = i
-    
-    #seen flag will be activated outside
+
+    # seen flag will be activated outside
     return minID
 
+
+def printSchedulerToFile(GlobalTaskSetsSchedulingArray):
+    file = open("SchedulerList.txt", "w")
+
+    for i in range(0, len(GlobalTaskSetsSchedulingArray)):
+    # Taskset numbers start at 1 but i starts from zero so i shifted that one unit  
+        file.write("Task Set : " + str(i+1))
+        file.write("\n")
+
+        for j in range(0, len(GlobalTaskSetsSchedulingArray[i])):
+            #  j shows the time and the GlobalTaskSetsSchedulingArray[i][j] has the id 
+            file.write(str(j) + " " +
+                       str(GlobalTaskSetsSchedulingArray[i][j]) + "\n")
 
 
 TaskSetsHolder, TASKS_SET_NUMBERS, TASKS_NUMBER_IN_A_SET = readTaskLists(
     "Task_List.txt")
 
-GlobalTaskSetsSchedulingArray = [] 
+# Store all scheduler results
+GlobalTaskSetsSchedulingArray = []
 # EDF algorithm starts from here
 for i in range(0, TASKS_SET_NUMBERS):
+    print("Running stage: ", i)
+    # finding hyperperiod
     periodList = []
     for j in range(0, TASKS_NUMBER_IN_A_SET):
         periodList.append(TaskSetsHolder[i][j].period)
 
     hyperPeriod = LCM(periodList)
+
     # lest consider that our hyper period is equal to 10000
-    hyperPeriod = 10000
-    LocalTaskSetSchedulingArray =  [hyperPeriod]
+    # hyperPeriod = 10000
+    # check for this wether it's empty or not
+    LocalTaskSetSchedulingArray = []
 
-    # print(hyperPeriod)
-    k = 0 
+    print(hyperPeriod)
+    k = 0
 
-    # while (k < hyperPeriod):
-    #     print("test")
-    #     # find the minimum period which haven't seen yet 
-    #     # until the period of that write it's id into the
-    #     # set K to the k = k + execution time of that task 
-    # # write the result into a file acctually append to a file 
-
-    for k in range ( 0, hyperPeriod):
+    missedFlag = False
+    for k in range(0, hyperPeriod):
+        # find the earliest deadLine task
         minimumID = findMinimumDeadlineNotSeen(TaskSetsHolder[i])
-        TaskSetsHolder[i][minimumID].seenFlagActivation()
-        for k in range ( k , k +  TaskSetsHolder[i][minimumID].ExecutionTime ):
-            LocalTaskSetSchedulingArray[k]= minimumID
+
+        # if minimumID is equal to -1 it means is idle for rest of this
+        if (minimumID == -1):
+            break
+
+        # execute that task for 1 cycle
+        # this function itself handels all thing related to deadline
+        executeResult = TaskSetsHolder[i][minimumID].execute(k)
+        if(executeResult == True):
+            LocalTaskSetSchedulingArray.append(minimumID)
+        else:
+            # task missed
+            missedFlag = True
+            break
+    if (missedFlag == False):
+        GlobalTaskSetsSchedulingArray.append(LocalTaskSetSchedulingArray)
+    else:
+        GlobalTaskSetsSchedulingArray.append([])
+printSchedulerToFile(GlobalTaskSetsSchedulingArray)
+
+# we will need a function to write to file

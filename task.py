@@ -4,7 +4,7 @@ import random
 def generateTaskFromUtilization(UtilizationSet):
     taskList = []
     for i in range(len(UtilizationSet)):
-        p = random.randint(1, 100)
+        p = random.randint(2, 20)
         e = p * UtilizationSet[i]
         taskList.append(task(p, e))
     return taskList
@@ -17,7 +17,7 @@ def writeTaskSetToFile(TaskSetID, taskSetList, file):
     file.write("\n")
     for i in range(len(taskSetList)):
         file.write(str(taskSetList[i].Period()) + " " +
-                   str(taskSetList[i].ExecutionTime()) + "\n")
+                   str(taskSetList[i].Utilization()) + "\n")
 
 
 class task(object):
@@ -35,7 +35,7 @@ class task(object):
         return self.executionTime
 
     def Utilization(self):
-        return (self.period)/(self.executionTime)
+        return (self.executionTime)/(self.period)
 
     def RelativeDeadline(self):
         return self.period
@@ -57,7 +57,11 @@ class task(object):
         return self.executedTime
 
     # it's automatically activate seen flag
-    def execute(self):
+    def execute(self,currentTime):
         self.executedTime = self.executedTime + 1
         if(self.executedTime == self.executionTime):
             self.seenFlagActivation()
+        if( currentTime > self.period):
+            return False
+        else:
+            return True

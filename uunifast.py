@@ -47,7 +47,7 @@ def uunifasts(N, n, U):
 
 # run 1000 time , make 100 job in each list and with 1 utilization
 # set proper values here 
-RUN = 1000   # how many times we run unifast algorithm
-JOB_NUMBERS = 100 #task number in each list 
+RUN = 100   # how many times we run unifast algorithm
+JOB_NUMBERS = 10 #task number in each list 
 UTILIZATION = 1 #Utilization
 uunifasts(RUN, JOB_NUMBERS, UTILIZATION)
