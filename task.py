@@ -1,6 +1,5 @@
 import random
 
-
 def generateTaskFromUtilization(UtilizationSet):
     taskList = []
     for i in range(len(UtilizationSet)):
@@ -11,7 +10,6 @@ def generateTaskFromUtilization(UtilizationSet):
 
 
 def writeTaskSetToFile(TaskSetID, taskSetList, file):
-
     # append to file here
     file.write("Task Set : " + str(TaskSetID))
     file.write("\n")
@@ -31,8 +29,11 @@ class task(object):
     def Period(self):
         return self.period
 
-    def ExecutionTime(self):
+    def getExecutionTime(self):
         return self.executionTime
+
+    def getExecutedTime(self):
+        return self.executedTime
 
     def Utilization(self):
         return (self.executionTime)/(self.period)
@@ -53,15 +54,16 @@ class task(object):
     def getID(self):
         return self.ID
 
-    def getExecuted(self):
-        return self.executedTime
+    def reset(self):
+        self.seen = False
+        self.executedTime = 0
 
     # it's automatically activate seen flag
-    def execute(self,currentTime):
+    def execute(self, currentTime):
         self.executedTime = self.executedTime + 1
         if(self.executedTime == self.executionTime):
             self.seenFlagActivation()
-        if( currentTime > self.period):
-            return False
-        else:
-            return True
+        # if(currentTime > self.period):
+        #     return False
+        # else:
+        #     return True
