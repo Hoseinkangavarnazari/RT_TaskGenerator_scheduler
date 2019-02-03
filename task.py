@@ -1,5 +1,6 @@
 import random
 
+
 def generateTaskFromUtilization(UtilizationSet):
     taskList = []
     for i in range(len(UtilizationSet)):
@@ -24,6 +25,8 @@ class task(object):
         self.period = p
         self.executionTime = e
         self.seen = False
+        self.ID = -1
+        self.executedTime = 0
 
     def Period(self):
         return self.period
@@ -36,7 +39,25 @@ class task(object):
 
     def RelativeDeadline(self):
         return self.period
+
     def getSeenFlag(self):
         return self.seen
-    def seen(self):
+
+    def seenFlagActivation(self):
         self.seen = True
+        return True
+
+    def setID(self, ID):
+        self.ID = ID
+
+    def getID(self):
+        return self.ID
+
+    def getExecuted(self):
+        return self.executedTime
+
+    # it's automatically activate seen flag
+    def execute(self):
+        self.executedTime = self.executedTime + 1
+        if(self.executedTime == self.executionTime):
+            self.seenFlagActivation()
