@@ -13,7 +13,7 @@ def checkFeasibility(Task_list, currentTime):
     # if executed == execution it's ok, else miss have happend in system
     # if executed == execution, call reset function
 
-    if(currentTime !=0):
+    if(currentTime != 0):
         for i in range(0, len(Task_list)):
             if((currentTime % Task_list[i].Period()) == 0):
                 if(Task_list[i].getExecutedTime() == Task_list[i].getExecutionTime()):
@@ -22,6 +22,7 @@ def checkFeasibility(Task_list, currentTime):
                     return False
 
     return True
+
 
 def readTaskLists(FileAddress):
     tasksListDB = open(FileAddress, 'r')
@@ -58,23 +59,26 @@ def readTaskLists(FileAddress):
             u = float(jobInfo[1])
             e = round(p * u)
             newCreatedTask = task(p, e)
-            newCreatedTask.setID(i)
+            # increased by one, starts ID's from one
+            newCreatedTask.setID(i+1)
             taskListObj.append(newCreatedTask)
 
         TaskSetsHolder.append(taskListObj)
 
     return TaskSetsHolder, TASKS_SET_NUMBERS, TASKS_NUMBER_IN_A_SET
 
+
 def findMinimumDeadlineNotSeen(TaskSet):
     minimum = INFINITY
-    minID = -1
+    minID = 0
     for i in range(0, len(TaskSet)):
         if (TaskSet[i].period <= minimum and TaskSet[i].getSeenFlag() == False):
             minimum = TaskSet[i].period
-            minID = i
+            minID = TaskSet[i].getID()
 
     # seen flag will be activated outside
     return minID
+
 
 def writeSchedulerToFile(GlobalTaskSetsSchedulingArray):
     file = open("SchedulerList.txt", "w")
@@ -92,8 +96,9 @@ def writeSchedulerToFile(GlobalTaskSetsSchedulingArray):
             file.write(str(j) + " " +
                        str(GlobalTaskSetsSchedulingArray[i][j]) + "\n")
 
+
 def fullyExecuted(TaskSet):
-    for i in range ( 0 , len(TaskSet)):
+    for i in range(0, len(TaskSet)):
         if (TaskSet[i].getExecutedTime() != TaskSet[i].getExecutionTime()):
             return False
     return True
@@ -135,22 +140,13 @@ for i in range(0, TASKS_SET_NUMBERS):
         minimumID = findMinimumDeadlineNotSeen(TaskSetsHolder[i])
 
         # if minimumID is equal to -1 it means is idle for rest of this
-        if (minimumID == -1):
-            break
-
-        # execute that task for 1 cycle
-        # this function itself handels all thing related to deadline
-        TaskSetsHolder[i][minimumID].execute(k)
-
-        # ................................................
-
-
-
-        # ................................................
-
-        LocalTaskSetSchedulingArray.append(minimumID)
-        
-   
+        if (minimumID == 0):
+            LocalTaskSetSchedulingArray.append(minimumID)
+        else:
+            # execute that task for 1 cycle
+            # this function itself handels all thing related to deadline
+            TaskSetsHolder[i][minimumID-1].execute(k)
+            LocalTaskSetSchedulingArray.append(minimumID)
 
 
     if (missedFlag == False and fullyExecuted(TaskSetsHolder[i])):
@@ -160,4 +156,3 @@ for i in range(0, TASKS_SET_NUMBERS):
 writeSchedulerToFile(GlobalTaskSetsSchedulingArray)
 
 # we will need a function to write to file
-
