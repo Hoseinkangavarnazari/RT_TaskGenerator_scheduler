@@ -23,7 +23,6 @@ def checkFeasibility(Task_list, currentTime):
 
     return True
 
-
 def readTaskLists(FileAddress):
     tasksListDB = open(FileAddress, 'r')
 
@@ -66,7 +65,6 @@ def readTaskLists(FileAddress):
 
     return TaskSetsHolder, TASKS_SET_NUMBERS, TASKS_NUMBER_IN_A_SET
 
-
 def findMinimumDeadlineNotSeen(TaskSet):
     minimum = INFINITY
     minID = -1
@@ -77,7 +75,6 @@ def findMinimumDeadlineNotSeen(TaskSet):
 
     # seen flag will be activated outside
     return minID
-
 
 def writeSchedulerToFile(GlobalTaskSetsSchedulingArray):
     file = open("SchedulerList.txt", "w")
@@ -94,6 +91,12 @@ def writeSchedulerToFile(GlobalTaskSetsSchedulingArray):
             #  j shows the time and the GlobalTaskSetsSchedulingArray[i][j] has the id
             file.write(str(j) + " " +
                        str(GlobalTaskSetsSchedulingArray[i][j]) + "\n")
+
+def fullyExecuted(TaskSet):
+    for i in range ( 0 , len(TaskSet)):
+        if (TaskSet[i].getExecutedTime() != TaskSet[i].getExecutionTime()):
+            return False
+    return True
 
 
 TaskSetsHolder, TASKS_SET_NUMBERS, TASKS_NUMBER_IN_A_SET = readTaskLists(
@@ -121,7 +124,7 @@ for i in range(0, TASKS_SET_NUMBERS):
 
     missedFlag = False
     for k in range(0, hyperPeriod):
-        
+
         feasible = checkFeasibility(TaskSetsHolder[i], k)
 
         if(feasible == False):
@@ -150,10 +153,11 @@ for i in range(0, TASKS_SET_NUMBERS):
    
 
 
-    if (missedFlag == False):
+    if (missedFlag == False and fullyExecuted(TaskSetsHolder[i])):
         GlobalTaskSetsSchedulingArray.append(LocalTaskSetSchedulingArray)
     else:
         GlobalTaskSetsSchedulingArray.append([])
 writeSchedulerToFile(GlobalTaskSetsSchedulingArray)
 
 # we will need a function to write to file
+
