@@ -1,9 +1,10 @@
 import random
 
+
 def generateTaskFromUtilization(UtilizationSet):
     taskList = []
     for i in range(len(UtilizationSet)):
-        p = random.randint(2, 20)
+        p = random.randint(2, 10)
         e = p * UtilizationSet[i]
         taskList.append(task(p, e))
     return taskList
@@ -25,6 +26,7 @@ class task(object):
         self.seen = False
         self.ID = -1
         self.executedTime = 0
+        self.cycle = 1
 
     def Period(self):
         return self.period
@@ -56,6 +58,7 @@ class task(object):
 
     def reset(self):
         self.seen = False
+        self.cycle += 1
         self.executedTime = 0
 
     # it's automatically activate seen flag

@@ -13,6 +13,10 @@ def checkFeasibility(Task_list, currentTime):
     # if executed == execution it's ok, else miss have happend in system
     # if executed == execution, call reset function
 
+    if(currentTime == 10000):
+        a = 0
+        for i in range(len(Task_list)):
+            a = a + Task_list[i].Utilization()
     if(currentTime != 0):
         for i in range(0, len(Task_list)):
             if((currentTime % Task_list[i].Period()) == 0):
@@ -42,6 +46,7 @@ def readTaskLists(FileAddress):
 
         # Holds data about a Task list
         taskListObj = []
+        totalU = 0
         for i in range(0, TASKS_NUMBER_IN_A_SET):
             jobInfo = tasksListDB.readline().split()
 
@@ -50,14 +55,15 @@ def readTaskLists(FileAddress):
             # I have saved 3 floating point for utilization and multiply period with 1000 in order to have integer execution time
             # It's a lot easier to coup with integer execution time than float one
 
-            # p = int(jobInfo[0])*1000
-            # u = floor(float(jobInfo[1])*1000)/1000
-            # e = round(p * u)
+            p = int(jobInfo[0])*1000
+            u = floor(float(jobInfo[1])*1000)/1000
+            e = round(p * u)
 
             # just for test , we should turn this off for real Tasksets
-            p = int(jobInfo[0])
-            u = float(jobInfo[1])
-            e = round(p * u)
+            #p = int(jobInfo[0])
+            #u = float(jobInfo[1])
+            #e = round(p * u)
+
             newCreatedTask = task(p, e)
             # increased by one, starts ID's from one
             newCreatedTask.setID(i+1)
@@ -68,14 +74,13 @@ def readTaskLists(FileAddress):
     return TaskSetsHolder, TASKS_SET_NUMBERS, TASKS_NUMBER_IN_A_SET
 
 
-def findMinimumDeadlineNotSeen(TaskSet):
+def findMinimumDeadlineNotSeen(TaskSet, currentTime):
     minimum = INFINITY
     minID = 0
     for i in range(0, len(TaskSet)):
-        if (TaskSet[i].period <= minimum and TaskSet[i].getSeenFlag() == False):
-            minimum = TaskSet[i].period
+        if ((TaskSet[i].period * TaskSet[i].cycle) <= minimum and TaskSet[i].getSeenFlag() == False):
+            minimum = TaskSet[i].period * TaskSet[i].cycle
             minID = TaskSet[i].getID()
-
     # seen flag will be activated outside
     return minID
 
@@ -105,7 +110,7 @@ def fullyExecuted(TaskSet):
 
 
 TaskSetsHolder, TASKS_SET_NUMBERS, TASKS_NUMBER_IN_A_SET = readTaskLists(
-    "checkExample.txt")
+    "Task_List.txt")
 
 # Store all scheduler results
 GlobalTaskSetsSchedulingArray = []
@@ -126,10 +131,14 @@ for i in range(0, TASKS_SET_NUMBERS):
 
     print(hyperPeriod)
     k = 0
+    counterTEST = 0
+    counterTEST2 = 0
 
     missedFlag = False
     for k in range(0, hyperPeriod):
 
+        flagLocalSeen = False
+      
         feasible = checkFeasibility(TaskSetsHolder[i], k)
 
         if(feasible == False):
@@ -137,17 +146,20 @@ for i in range(0, TASKS_SET_NUMBERS):
             break
 
         # find the earliest deadLine task
-        minimumID = findMinimumDeadlineNotSeen(TaskSetsHolder[i])
-
+        minimumID = findMinimumDeadlineNotSeen(TaskSetsHolder[i], k)
+        if(minimumID > 10 or minimumID < 0):
+            print("pause")
         # if minimumID is equal to -1 it means is idle for rest of this
         if (minimumID == 0):
             LocalTaskSetSchedulingArray.append(minimumID)
+            flagLocalSeen = True
         else:
+            counterTEST += 1
             # execute that task for 1 cycle
             # this function itself handels all thing related to deadline
             TaskSetsHolder[i][minimumID-1].execute(k)
             LocalTaskSetSchedulingArray.append(minimumID)
-
+            flagLocalSeen = True
 
     if (missedFlag == False and fullyExecuted(TaskSetsHolder[i])):
         GlobalTaskSetsSchedulingArray.append(LocalTaskSetSchedulingArray)
